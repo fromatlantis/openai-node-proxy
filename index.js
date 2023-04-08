@@ -17,8 +17,18 @@ const openaiConfig = new Configuration({
 
 const openaiClient = new OpenAIApi(openaiConfig);
 
-app.get("/hello", (req, res) => {
-  res.send("world");
+app.get("/hello", async (req, res) => {
+  const openaiRes = await openaiClient.createChatCompletion(
+    {
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: "周杰伦出过哪些专辑？" }],
+      stream: true
+    },
+    {
+      responseType: "stream",
+    }
+  );
+  openaiRes.data.pipe(res);
 });
 
 const chatLimiter = rateLimit({
@@ -34,11 +44,11 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
       const length = encode(cur.content).length;
       return acc + length;
     }, 0);
-    if(tokensLength > MAX_TOKENS){
+    if (tokensLength > MAX_TOKENS) {
       res.status(500).send({
         error: {
-          message: `max_tokens is limited: ${MAX_TOKENS}`
-        }
+          message: `max_tokens is limited: ${MAX_TOKENS}`,
+        },
       });
     }
     const openaiRes = await openaiClient.createChatCompletion(req.body, {
@@ -59,12 +69,12 @@ const imageLimiter = rateLimit({
 
 app.post("/v1/images/generations", imageLimiter, async (req, res) => {
   try {
-    const tokensLength = encode(req.body.prompt).length
-    if(tokensLength > MAX_TOKENS){
+    const tokensLength = encode(req.body.prompt).length;
+    if (tokensLength > MAX_TOKENS) {
       res.status(500).send({
         error: {
-          message: `max_tokens is limited: ${MAX_TOKENS}`
-        }
+          message: `max_tokens is limited: ${MAX_TOKENS}`,
+        },
       });
     }
     const openaiRes = await openaiClient.createImage(req.body);
