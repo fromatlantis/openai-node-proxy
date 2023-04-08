@@ -1,0 +1,19 @@
+{
+  "name": "nodejs-app",
+  "version": "1.0.0",
+  "description": "A minimal Node.js web application.",
+  "main": "index.js",
+  "author": "alphasec",
+  "license": "MIT",
+   "dependencies": {
+    "@vercel/node": "^2.9.13",
+    "express": "*",
+    "openai": "*",
+    "body-parser": "*",
+    "express-rate-limit": "*",
+    "gpt-3-encoder": "*" 
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
