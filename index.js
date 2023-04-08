@@ -6,6 +6,8 @@ const { encode } = require("gpt-3-encoder");
 
 const PORT = 3000;
 const MAX_TOKENS = process.env.MAX_TOKENS || 512;
+const CHAT_LIMITER = process.env.CHAT_LIMITER || 9;
+const IMAGE_LIMITER = process.env.IMAGE_LIMITER || 3;
 
 const app = express();
 
@@ -33,7 +35,7 @@ app.get("/hello", async (req, res) => {
 
 const chatLimiter = rateLimit({
   windowMs: 8 * 60 * 60 * 1000, // 8 hoour
-  max: 9,
+  max: CHAT_LIMITER,
   message:
     "Too many requests created from this IP, please try again after 8 hour.",
 });
@@ -62,7 +64,7 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
 
 const imageLimiter = rateLimit({
   windowMs: 8 * 60 * 60 * 1000, // 8 hoour
-  max: 3,
+  max: IMAGE_LIMITER,
   message:
     "Too many requests created from this IP, please try again after an hour.",
 });
