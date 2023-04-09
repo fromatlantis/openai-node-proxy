@@ -6,6 +6,8 @@ const { encode } = require("gpt-3-encoder");
 
 const PORT = 3000;
 const MAX_TOKENS = process.env.MAX_TOKENS || 512;
+
+const LIMITER_MSG = "Too many requests from this IP, please try again later.";
 const CHAT_LIMITER = process.env.CHAT_LIMITER || 9;
 const IMAGE_LIMITER = process.env.IMAGE_LIMITER || 3;
 
@@ -20,17 +22,7 @@ const openaiConfig = new Configuration({
 const openaiClient = new OpenAIApi(openaiConfig);
 
 app.get("/hello", async (req, res) => {
-  const openaiRes = await openaiClient.createChatCompletion(
-    {
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: "周杰伦出过哪些专辑？" }],
-      stream: true,
-    },
-    {
-      responseType: "stream",
-    }
-  );
-  openaiRes.data.pipe(res);
+  res.send("world");
 });
 
 const chatLimiter = rateLimit({
@@ -38,8 +30,7 @@ const chatLimiter = rateLimit({
   max: CHAT_LIMITER,
   message: {
     error: {
-      message:
-        "Too many requests created from this IP, please try again later.",
+      message: LIMITER_MSG,
     },
   },
 });
@@ -71,8 +62,7 @@ const imageLimiter = rateLimit({
   max: IMAGE_LIMITER,
   message: {
     error: {
-      message:
-        "Too many requests created from this IP, please try again later.",
+      message: LIMITER_MSG,
     },
   },
 });
