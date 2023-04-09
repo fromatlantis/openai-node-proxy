@@ -6,7 +6,7 @@ const { encode } = require("gpt-3-encoder");
 
 const PORT = 3000;
 const MAX_TOKENS = process.env.MAX_TOKENS || 512;
-const CHAT_LIMITER = process.env.CHAT_LIMITER || 9;
+const CHAT_LIMITER = process.env.CHAT_LIMITER || 20;
 const IMAGE_LIMITER = process.env.IMAGE_LIMITER || 3;
 
 const app = express();
@@ -24,7 +24,7 @@ app.get("/hello", async (req, res) => {
     {
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: "周杰伦出过哪些专辑？" }],
-      stream: true
+      stream: true,
     },
     {
       responseType: "stream",
@@ -36,8 +36,12 @@ app.get("/hello", async (req, res) => {
 const chatLimiter = rateLimit({
   windowMs: 8 * 60 * 60 * 1000, // 8 hoour
   max: CHAT_LIMITER,
-  message:
-    "Too many requests created from this IP, please try again after 8 hour.",
+  message: {
+    error: {
+      message:
+        "Too many requests created from this IP, please try again after 8 hour.",
+    },
+  },
 });
 
 app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
@@ -58,15 +62,19 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
     });
     openaiRes.data.pipe(res);
   } catch (error) {
-    res.status(500).send(error.message);
+    res.status(500).send(error);
   }
 });
 
 const imageLimiter = rateLimit({
   windowMs: 8 * 60 * 60 * 1000, // 8 hoour
   max: IMAGE_LIMITER,
-  message:
-    "Too many requests created from this IP, please try again after an hour.",
+  message: {
+    error: {
+      message:
+        "Too many requests created from this IP, please try again after 8 hour.",
+    },
+  },
 });
 
 app.post("/v1/images/generations", imageLimiter, async (req, res) => {
@@ -82,7 +90,7 @@ app.post("/v1/images/generations", imageLimiter, async (req, res) => {
     const openaiRes = await openaiClient.createImage(req.body);
     res.send(openaiRes.data);
   } catch (error) {
-    res.status(500).send(error.message);
+    res.status(500).send(error);
   }
 });
 
