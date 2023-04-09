@@ -7,7 +7,8 @@ const { encode } = require("gpt-3-encoder");
 const PORT = 3000;
 const MAX_TOKENS = process.env.MAX_TOKENS || 512;
 
-const LIMITER_MSG = "Too many requests from this IP, please try again later.";
+// const LIMITER_MSG = "Too many requests from this IP, please try again later.";
+const LIMITER_MSG = "当前访问量过多，请稍后再试。如有需要请联系作者微信号：lomo-pis。";
 const CHAT_LIMITER = process.env.CHAT_LIMITER || 9;
 const IMAGE_LIMITER = process.env.IMAGE_LIMITER || 3;
 
