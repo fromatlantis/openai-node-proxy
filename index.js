@@ -78,7 +78,7 @@ const imageLimiter = rateLimit({
       request.ip,
       request.headers["x-forwarded-for"],
       request.connection.remoteAddress,
-      request.body.messages[0].content
+      request.body.prompt
     );
     return request.ip;
   },
