@@ -32,7 +32,7 @@ const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(request.headers["x-real-ip"], request.ip)
+    console.log(request.body.messages)
     return request.ip
   },
   message: {
