@@ -8,13 +8,14 @@ const PORT = 3000;
 const MAX_TOKENS = process.env.MAX_TOKENS || 512;
 
 // const LIMITER_MSG = "Too many requests from this IP, please try again later.";
-const LIMITER_MSG = "当前访问量过多，请稍后再试。如有需要请联系作者微信号：lomo-pis。";
+const LIMITER_MSG =
+  "当前访问量过多，请稍后再试。如有需要请联系作者微信号：lomo-pis。";
 const CHAT_LIMITER = process.env.CHAT_LIMITER || 9;
 const IMAGE_LIMITER = process.env.IMAGE_LIMITER || 3;
 
 const app = express();
 
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 app.use(bodyParser.json());
 
@@ -28,13 +29,14 @@ app.get("/hello", async (req, res) => {
   res.send("world");
 });
 
+const keyGenerator = (request, response) => {
+  console.log(request.ip, request.body.messages[0].content);
+  return request.ip;
+};
 const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
-  keyGenerator: (request, response) => {
-    console.log(request.ip, request.body.messages[0].content);
-    return request.ip
-  },
+  keyGenerator,
   message: {
     error: {
       message: LIMITER_MSG,
@@ -67,6 +69,7 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
 const imageLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: IMAGE_LIMITER,
+  keyGenerator,
   message: {
     error: {
       message: LIMITER_MSG,
