@@ -16,8 +16,9 @@ const IMAGE_LIMITER = process.env.IMAGE_LIMITER || 3;
 
 const app = express();
 
-app.set("trust proxy", 1);
+// app.set("trust proxy", 1);
 app.use(requestIp.mw());
+
 app.use(bodyParser.json());
 
 const openaiConfig = new Configuration({
