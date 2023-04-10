@@ -16,10 +16,10 @@ const IMAGE_LIMITER = process.env.IMAGE_LIMITER || 3;
 
 const app = express();
 
-// app.set("trust proxy", 1);
 app.use(requestIp.mw());
-
 app.use(bodyParser.json());
+
+app.set("trust proxy", 1);
 
 const openaiConfig = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -35,8 +35,8 @@ const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(request.clientIp);
-    return request.ip;
+    console.log(request.clientIp, request.body.messages[0].content);
+    return request.clientIp;
   },
   message: {
     error: {
@@ -71,8 +71,8 @@ const imageLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: IMAGE_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(request.ip);
-    return request.ip;
+    console.log(request.clientIp, request.body.prompt);
+    return request.clientIp;
   },
   message: {
     error: {
