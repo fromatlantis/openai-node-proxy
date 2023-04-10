@@ -29,6 +29,10 @@ app.get("/hello", async (req, res) => {
 const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
+  keyGenerator: (request, response) => {
+    console.log(request.ip)
+    return request.ip
+  },
   message: {
     error: {
       message: LIMITER_MSG,
