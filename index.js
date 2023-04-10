@@ -29,14 +29,13 @@ app.get("/hello", async (req, res) => {
   res.send("world");
 });
 
-const keyGenerator = (request, response) => {
-  console.log(request.ip, request.body.messages[0].content);
-  return request.ip;
-};
 const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
-  keyGenerator,
+  keyGenerator: (request, response) => {
+    console.log(request.ip, request.body.messages[0].content);
+    return request.ip;
+  },
   message: {
     error: {
       message: LIMITER_MSG,
@@ -69,7 +68,10 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
 const imageLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: IMAGE_LIMITER,
-  keyGenerator,
+  keyGenerator: (request, response) => {
+    console.log(request.ip, request.body.prompt);
+    return request.ip;
+  },
   message: {
     error: {
       message: LIMITER_MSG,
