@@ -3,6 +3,7 @@ const express = require("express");
 const rateLimit = require("express-rate-limit");
 const { Configuration, OpenAIApi } = require("openai");
 const { encode } = require("gpt-3-encoder");
+const requestIp = require("request-ip");
 
 const PORT = 3000;
 const MAX_TOKENS = process.env.MAX_TOKENS || 512;
@@ -16,7 +17,7 @@ const IMAGE_LIMITER = process.env.IMAGE_LIMITER || 3;
 const app = express();
 
 app.set("trust proxy", 1);
-
+app.use(requestIp.mw());
 app.use(bodyParser.json());
 
 const openaiConfig = new Configuration({
@@ -33,12 +34,7 @@ const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(
-      request.ip,
-      request.headers["x-forwarded-for"],
-      request.connection.remoteAddress,
-      request.body.messages[0].content
-    );
+    console.log(request.clientIp);
     return request.ip;
   },
   message: {

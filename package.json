@@ -11,7 +11,8 @@
     "openai": "*",
     "body-parser": "*",
     "express-rate-limit": "*",
-    "gpt-3-encoder": "*" 
+    "gpt-3-encoder": "*" ,
+    "request-ip": "*"
   },
   "scripts": {
     "start": "node index.js"

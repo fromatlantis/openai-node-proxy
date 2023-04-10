@@ -7,6 +7,7 @@ specifiers:
   express-rate-limit: '*'
   gpt-3-encoder: '*'
   openai: '*'
+  request-ip: '*'
 
 dependencies:
   '@vercel/node': 2.10.3
@@ -15,6 +16,7 @@ dependencies:
   express-rate-limit: 6.7.0_express@4.18.2
   gpt-3-encoder: 1.1.4
   openai: 3.2.1
+  request-ip: 3.3.0
 
 packages:
 
@@ -967,6 +969,10 @@ packages:
       http-errors: 2.0.0
       iconv-lite: 0.4.24
       unpipe: 1.0.0
+    dev: false
+
+  /request-ip/3.3.0:
+    resolution: {integrity: sha512-cA6Xh6e0fDBBBwH77SLJaJPBmD3nWVAcF9/XAcsrIHdjhFzFiB5aNQFytdjCGPezU3ROwrR11IddKAM08vohxA==}
     dev: false
 
   /require-from-string/2.0.2:
