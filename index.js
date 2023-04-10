@@ -14,6 +14,8 @@ const IMAGE_LIMITER = process.env.IMAGE_LIMITER || 3;
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(bodyParser.json());
 
 const openaiConfig = new Configuration({
@@ -30,7 +32,7 @@ const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(request.headers["x-real-ip"])
+    console.log(request.headers["x-real-ip"], request.ip)
     return request.ip
   },
   message: {
