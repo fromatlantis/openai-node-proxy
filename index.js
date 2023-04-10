@@ -33,7 +33,12 @@ const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(request.ip, request.body.messages[0].content);
+    console.log(
+      request.ip,
+      request.headers["x-forwarded-for"],
+      request.connection.remoteAddress,
+      request.body.messages[0].content
+    );
     return request.ip;
   },
   message: {
@@ -69,7 +74,7 @@ const imageLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: IMAGE_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(request.ip, `image->${request.body.prompt}s`);
+    console.log(request.ip, `image->${request.body.prompt}`);
     return request.ip;
   },
   message: {
