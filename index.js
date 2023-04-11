@@ -19,7 +19,7 @@ const app = express();
 app.use(requestIp.mw());
 app.use(bodyParser.json());
 
-app.set("trust proxy", 1);
+app.set("trust proxy", "loopback");
 
 const openaiConfig = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
