@@ -83,7 +83,7 @@ app.post("/v1/chat/completions2", chatLimiter, async (req, res) => {
       },
     });
   }
-  const openaiRes = await fetch(`https://${baseURL}/v1/chat/completions`, {
+  const openaiRes = await fetch(`https://api.openai.com/v1/chat/completions`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
