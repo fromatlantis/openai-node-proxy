@@ -93,7 +93,7 @@ app.post("/v1/chat/completions2", chatLimiter, async (req, res) => {
   }).catch((err) => {
     res.end();
   });
-  openaiRes.data.pipe(res);
+  openaiRes.pipe(res);
   // const openaiRes = await openaiClient.createChatCompletion(req.body, {
   //   responseType: "stream",
   // });
