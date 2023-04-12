@@ -93,8 +93,7 @@ app.post("/v1/chat/completions2", chatLimiter, async (req, res) => {
   }).catch((err) => {
     res.end();
   });
-  console.log(openaiRes.body);
-  res.send(openaiRes.body);
+  openaiRes.body.pipe(res);
   //openaiRes.pipe(openaiRes.body);
   // openaiRes.pipe(res);
   // const openaiRes = await openaiClient.createChatCompletion(req.body, {
