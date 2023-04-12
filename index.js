@@ -63,7 +63,7 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
     });
     openaiRes.data.pipe(res);
   } catch (error) {
-    res.status(500).send(error);
+    res.send(error);
   }
 });
 
