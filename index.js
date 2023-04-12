@@ -19,7 +19,7 @@ const app = express();
 app.use(requestIp.mw());
 app.use(bodyParser.json());
 
-app.set("trust proxy", ['loopback', 'linklocal', 'uniquelocal']);
+app.set("trust proxy", true);
 
 const openaiConfig = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -35,7 +35,10 @@ const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(request.clientIp, request.body.messages[request.body.messages.length-1].content);
+    console.log(
+      request.clientIp,
+      request.body.messages[request.body.messages.length - 1].content
+    );
     return request.clientIp;
   },
   message: {
@@ -65,6 +68,39 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
   } catch (error) {
     res.end();
   }
+});
+
+app.post("/v1/chat/completions2", chatLimiter, async (req, res) => {
+  // try {
+  const tokensLength = req.body.messages.reduce((acc, cur) => {
+    const length = encode(cur.content).length;
+    return acc + length;
+  }, 0);
+  if (tokensLength > MAX_TOKENS) {
+    res.status(500).send({
+      error: {
+        message: `max_tokens is limited: ${MAX_TOKENS}`,
+      },
+    });
+  }
+  const openaiRes = await fetch(`https://${baseURL}/v1/chat/completions`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    method: "POST",
+    body: JSON.stringify(req.body),
+  }).catch((err) => {
+    res.end();
+  });
+  openaiRes.data.pipe(res);
+  // const openaiRes = await openaiClient.createChatCompletion(req.body, {
+  //   responseType: "stream",
+  // });
+  //   openaiRes.data.pipe(res);
+  // } catch (error) {
+  //   res.end();
+  // }
 });
 
 const imageLimiter = rateLimit({
