@@ -71,7 +71,7 @@ const imageLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: IMAGE_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(request.clientIp, `image->${request.body.prompt}`);
+    console.log(request.clientIp, `image -> ${request.body.prompt}`);
     return request.clientIp;
   },
   message: {
