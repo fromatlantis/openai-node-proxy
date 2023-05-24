@@ -58,17 +58,18 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
       const length = encode(cur.content).length;
       return acc + length;
     }, 0);
-    console.log(auth)
+    console.log(auth);
     if (!auth && tokensLength > MAX_TOKENS) {
       res.status(500).send({
         error: {
           message: `max_tokens is limited: ${MAX_TOKENS}`,
         },
       });
-    } else {
+    }
+    if (auth) {
       openaiClient.apiKey = auth;
     }
-    console.log(openaiClient.apiKey)
+    console.log(openaiClient.apiKey);
     const openaiRes = await openaiClient.createChatCompletion(req.body, {
       responseType: "stream",
     });
@@ -105,7 +106,8 @@ app.post("/v1/images/generations", imageLimiter, async (req, res) => {
           message: `max_tokens is limited: ${MAX_TOKENS}`,
         },
       });
-    } else {
+    }
+    if (auth) {
       openaiClient.apiKey = auth;
     }
     const openaiRes = await openaiClient.createImage(req.body);
