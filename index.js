@@ -42,6 +42,7 @@ const chatLimiter = rateLimit({
     return request.clientIp;
   },
   skip: (request) => {
+    console.log(request.headers["Authorization"])
     return request.headers["Authorization"];
   },
   message: {
