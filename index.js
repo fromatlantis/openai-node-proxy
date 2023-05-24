@@ -42,8 +42,7 @@ const chatLimiter = rateLimit({
     return request.clientIp;
   },
   skip: (request) => {
-    console.log(request.headers["authorization"]);
-    return request.headers["Authorization"];
+    return request.headers["authorization"];
   },
   message: {
     error: {
@@ -54,8 +53,7 @@ const chatLimiter = rateLimit({
 
 app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
   try {
-    console.log("headers->", req.headers);
-    const auth = req.headers["authorization"];
+    const [_, auth] = req.headers["authorization"].split(" ");
     const tokensLength = req.body.messages.reduce((acc, cur) => {
       const length = encode(cur.content).length;
       return acc + length;
@@ -69,7 +67,7 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
       });
     }
     if (auth) {
-      openaiClient.apiKey = auth;
+      openaiClient.configuration.apiKey = auth;
     }
     console.log("key->", openaiClient);
     const openaiRes = await openaiClient.createChatCompletion(req.body, {
@@ -89,7 +87,7 @@ const imageLimiter = rateLimit({
     return request.clientIp;
   },
   skip: (request) => {
-    return request.headers["Authorization"];
+    return request.headers["authorization"];
   },
   message: {
     error: {
@@ -100,7 +98,7 @@ const imageLimiter = rateLimit({
 
 app.post("/v1/images/generations", imageLimiter, async (req, res) => {
   try {
-    const auth = req.headers["Authorization"];
+    const [_, auth] = req.headers["authorization"].split(" ");
     const tokensLength = encode(req.body.prompt).length;
     if (!auth && tokensLength > MAX_TOKENS) {
       res.status(500).send({
@@ -110,7 +108,7 @@ app.post("/v1/images/generations", imageLimiter, async (req, res) => {
       });
     }
     if (auth) {
-      openaiClient.apiKey = auth;
+      openaiClient.configuration.apiKey = auth;
     }
     const openaiRes = await openaiClient.createImage(req.body);
     res.send(openaiRes.data);
