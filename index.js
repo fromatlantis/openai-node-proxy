@@ -53,6 +53,7 @@ const chatLimiter = rateLimit({
 
 app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
   try {
+    console.log('headers->',req.headers)
     const auth = req.headers["Authorization"];
     const tokensLength = req.body.messages.reduce((acc, cur) => {
       const length = encode(cur.content).length;
