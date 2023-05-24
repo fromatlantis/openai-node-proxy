@@ -42,7 +42,7 @@ const chatLimiter = rateLimit({
     return request.clientIp;
   },
   skip: (request) => {
-    console.log(request.headers["Authorization"])
+    console.log(request.headers["authorization"]);
     return request.headers["Authorization"];
   },
   message: {
@@ -54,13 +54,13 @@ const chatLimiter = rateLimit({
 
 app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
   try {
-    console.log('headers->',req.headers)
-    const auth = req.headers["Authorization"];
+    console.log("headers->", req.headers);
+    const auth = req.headers["authorization"];
     const tokensLength = req.body.messages.reduce((acc, cur) => {
       const length = encode(cur.content).length;
       return acc + length;
     }, 0);
-    console.log(auth);
+    console.log("auth->", auth);
     if (!auth && tokensLength > MAX_TOKENS) {
       res.status(500).send({
         error: {
@@ -71,7 +71,7 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
     if (auth) {
       openaiClient.apiKey = auth;
     }
-    console.log(openaiClient.apiKey);
+    console.log("key->", openaiClient);
     const openaiRes = await openaiClient.createChatCompletion(req.body, {
       responseType: "stream",
     });
