@@ -35,8 +35,14 @@ const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(request.clientIp, request.body.messages[request.body.messages.length-1].content);
+    console.log(
+      request.clientIp,
+      request.body.messages[request.body.messages.length - 1].content
+    );
     return request.clientIp;
+  },
+  skip: (request) => {
+    return request.headers["Authorization"];
   },
   message: {
     error: {
@@ -47,16 +53,19 @@ const chatLimiter = rateLimit({
 
 app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
   try {
+    const auth = req.headers["Authorization"];
     const tokensLength = req.body.messages.reduce((acc, cur) => {
       const length = encode(cur.content).length;
       return acc + length;
     }, 0);
-    if (tokensLength > MAX_TOKENS) {
+    if (!auth && tokensLength > MAX_TOKENS) {
       res.status(500).send({
         error: {
           message: `max_tokens is limited: ${MAX_TOKENS}`,
         },
       });
+    } else {
+      openaiClient.apiKey = auth;
     }
     const openaiRes = await openaiClient.createChatCompletion(req.body, {
       responseType: "stream",
@@ -74,6 +83,9 @@ const imageLimiter = rateLimit({
     console.log(request.clientIp, `image -> ${request.body.prompt}`);
     return request.clientIp;
   },
+  skip: (request) => {
+    return request.headers["Authorization"];
+  },
   message: {
     error: {
       message: LIMITER_MSG,
@@ -83,13 +95,16 @@ const imageLimiter = rateLimit({
 
 app.post("/v1/images/generations", imageLimiter, async (req, res) => {
   try {
+    const auth = req.headers["Authorization"];
     const tokensLength = encode(req.body.prompt).length;
-    if (tokensLength > MAX_TOKENS) {
+    if (!auth && tokensLength > MAX_TOKENS) {
       res.status(500).send({
         error: {
           message: `max_tokens is limited: ${MAX_TOKENS}`,
         },
       });
+    } else {
+      openaiClient.apiKey = auth;
     }
     const openaiRes = await openaiClient.createImage(req.body);
     res.send(openaiRes.data);
