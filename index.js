@@ -58,6 +58,7 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
       const length = encode(cur.content).length;
       return acc + length;
     }, 0);
+    console.log(auth)
     if (!auth && tokensLength > MAX_TOKENS) {
       res.status(500).send({
         error: {
@@ -67,6 +68,7 @@ app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
     } else {
       openaiClient.apiKey = auth;
     }
+    console.log(openaiClient.apiKey)
     const openaiRes = await openaiClient.createChatCompletion(req.body, {
       responseType: "stream",
     });
