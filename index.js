@@ -35,14 +35,8 @@ const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(
-      request.clientIp,
-      request.body.messages[request.body.messages.length - 1].content
-    );
+    console.log(request.clientIp, request.body.messages[request.body.messages.length-1].content);
     return request.clientIp;
-  },
-  skip: (request) => {
-    return request.headers["authorization"];
   },
   message: {
     error: {
@@ -53,23 +47,17 @@ const chatLimiter = rateLimit({
 
 app.post("/v1/chat/completions", chatLimiter, async (req, res) => {
   try {
-    const [_, auth] = req.headers["authorization"].split(" ");
     const tokensLength = req.body.messages.reduce((acc, cur) => {
       const length = encode(cur.content).length;
       return acc + length;
     }, 0);
-    console.log("auth->", auth);
-    if (!auth && tokensLength > MAX_TOKENS) {
+    if (tokensLength > MAX_TOKENS) {
       res.status(500).send({
         error: {
           message: `max_tokens is limited: ${MAX_TOKENS}`,
         },
       });
     }
-    if (auth) {
-      openaiClient.configuration.apiKey = auth;
-    }
-    console.log("key->", openaiClient);
     const openaiRes = await openaiClient.createChatCompletion(req.body, {
       responseType: "stream",
     });
@@ -83,11 +71,8 @@ const imageLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: IMAGE_LIMITER,
   keyGenerator: (request, response) => {
-    console.log(request.clientIp, `image -> ${request.body.prompt}`);
+    console.log(request.clientIp, `image->${request.body.prompt}`);
     return request.clientIp;
-  },
-  skip: (request) => {
-    return request.headers["authorization"];
   },
   message: {
     error: {
@@ -98,17 +83,13 @@ const imageLimiter = rateLimit({
 
 app.post("/v1/images/generations", imageLimiter, async (req, res) => {
   try {
-    const [_, auth] = req.headers["authorization"].split(" ");
     const tokensLength = encode(req.body.prompt).length;
-    if (!auth && tokensLength > MAX_TOKENS) {
+    if (tokensLength > MAX_TOKENS) {
       res.status(500).send({
         error: {
           message: `max_tokens is limited: ${MAX_TOKENS}`,
         },
       });
-    }
-    if (auth) {
-      openaiClient.configuration.apiKey = auth;
     }
     const openaiRes = await openaiClient.createImage(req.body);
     res.send(openaiRes.data);
