@@ -31,6 +31,10 @@ app.get("/hello", async (req, res) => {
   res.send("world");
 });
 
+app.post("/sam", async (req, res) => {
+  res.send("sd");
+});
+
 const chatLimiter = rateLimit({
   windowMs: 3 * 60 * 60 * 1000, // 3 hoour
   max: CHAT_LIMITER,
