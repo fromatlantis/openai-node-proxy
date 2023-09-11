@@ -31,7 +31,7 @@ app.get("/hello", async (req, res) => {
   res.send("world");
 });
 
-app.post("/sam", async (req, res) => {
+app.post("/sam/sam-predict", async (req, res) => {
   res.send("sd");
 });
 
